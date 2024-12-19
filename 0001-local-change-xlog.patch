@@ -88,14 +88,14 @@ index 3da89cd9..499cdf79 100644
 -            std::make_unique<comm::Thread>(boost::bind(&XloggerAppender::__DelTimeoutFile, this, config_.cachedir_));
 -        thread_timeout_cache_->start_after(2 * 60 * 1000);
 +            std::make_unique<comm::Thread>(boost::bind(&XloggerAppender::__DelTimeoutFile, this, config_.logdir_));
-+        thread_timeout_cache_->start_after(1 * 60 * 1000);
++        thread_timeout_cache_->start_after(30 * 1000);
          thread_moveold_ = std::make_unique<comm::Thread>(boost::bind(&XloggerAppender::__MoveOldFiles,
                                                                       this,
                                                                       config_.cachedir_,
                                                                       config_.logdir_,
                                                                       config_.nameprefix_));
 -        thread_moveold_->start_after(3 * 60 * 1000);
-+        thread_moveold_->start_after(2 * 60 * 1000);
++        thread_moveold_->start_after(90 * 1000);
  #ifdef __APPLE__
          setAttrProtectionNone(config_.cachedir_.c_str());
  #endif
