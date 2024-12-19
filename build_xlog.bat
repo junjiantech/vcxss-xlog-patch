@@ -1,5 +1,5 @@
 @echo off
-$env:NDK_ROOT="D:\environment\Android\ndk\20.0.5594570"
+$env:NDK_ROOT="D:\environment\Android\ndk\20.0.5594570\"
 @REM clone mars
 git clone https://github.com/Tencent/mars.git
 @REM 应用变更
@@ -13,4 +13,4 @@ python build_android.py "--target libzstd_static marsxlog" "armeabi-v7a" "arm64-
 cp -r libraries/mars_android_sdk/libs/* ../../libs-xlog/src/main/jniLibs/
 @REM 删除仓库
 cd ../../
-Remove-Item ".\mars" -Recurse
+rmdir /s/q mars
