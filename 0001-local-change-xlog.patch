@@ -1,0 +1,104 @@
+From e550b3dc3ecb44bb744bc667e12b8d5469ed2ce9 Mon Sep 17 00:00:00 2001
+From: junjian <cnrivkaer@outlook.com>
+Date: Thu, 19 Dec 2024 14:16:44 +0800
+Subject: [PATCH] local change xlog
+
+---
+ mars/xlog/jni/ConsoleLog.cc  |  5 +----
+ mars/xlog/jni/Java2C_Xlog.cc | 20 --------------------
+ mars/xlog/src/appender.cc    |  6 +++---
+ 3 files changed, 4 insertions(+), 27 deletions(-)
+
+diff --git a/mars/xlog/jni/ConsoleLog.cc b/mars/xlog/jni/ConsoleLog.cc
+index 6331ab5e..b351c84d 100644
+--- a/mars/xlog/jni/ConsoleLog.cc
++++ b/mars/xlog/jni/ConsoleLog.cc
+@@ -35,10 +35,7 @@ void ConsoleLog(const XLoggerInfo* _info, const char* _log) {
+ 
+         snprintf(result_log,
+                  sizeof(result_log),
+-                 "[%s:%d, %s]:%s",
+-                 filename,
+-                 _info->line,
+-                 strFuncName,
++                 "%s",
+                  _log ? _log : "NULL==log!!!");
+         __android_log_write(_info->level + 2, _info->tag ? _info->tag : "", (const char*)result_log);
+     } else {
+diff --git a/mars/xlog/jni/Java2C_Xlog.cc b/mars/xlog/jni/Java2C_Xlog.cc
+index 2383023d..0fdbe63b 100644
+--- a/mars/xlog/jni/Java2C_Xlog.cc
++++ b/mars/xlog/jni/Java2C_Xlog.cc
+@@ -206,9 +206,6 @@ JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_logWrite2(JNIEnv* env,
+                                                                  jlong _log_instance_ptr,
+                                                                  int _level,
+                                                                  jstring _tag,
+-                                                                 jstring _filename,
+-                                                                 jstring _funcname,
+-                                                                 jint _line,
+                                                                  jint _pid,
+                                                                  jlong _tid,
+                                                                  jlong _maintid,
+@@ -220,7 +217,6 @@ JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_logWrite2(JNIEnv* env,
+     XLoggerInfo xlog_info = XLOGGER_INFO_INITIALIZER;
+     gettimeofday(&xlog_info.timeval, NULL);
+     xlog_info.level = (TLogLevel)_level;
+-    xlog_info.line = (int)_line;
+     xlog_info.pid = (int)_pid;
+     xlog_info.tid = LONGTHREADID2INT(_tid);
+     xlog_info.maintid = LONGTHREADID2INT(_maintid);
+@@ -234,14 +230,6 @@ JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_logWrite2(JNIEnv* env,
+         tag_cstr = env->GetStringUTFChars(_tag, NULL);
+     }
+ 
+-    if (NULL != _filename) {
+-        filename_cstr = env->GetStringUTFChars(_filename, NULL);
+-    }
+-
+-    if (NULL != _funcname) {
+-        funcname_cstr = env->GetStringUTFChars(_funcname, NULL);
+-    }
+-
+     if (NULL != _log) {
+         log_cstr = env->GetStringUTFChars(_log, NULL);
+     }
+@@ -256,14 +244,6 @@ JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_logWrite2(JNIEnv* env,
+         env->ReleaseStringUTFChars(_tag, tag_cstr);
+     }
+ 
+-    if (NULL != _filename) {
+-        env->ReleaseStringUTFChars(_filename, filename_cstr);
+-    }
+-
+-    if (NULL != _funcname) {
+-        env->ReleaseStringUTFChars(_funcname, funcname_cstr);
+-    }
+-
+     if (NULL != _log) {
+         env->ReleaseStringUTFChars(_log, log_cstr);
+     }
+diff --git a/mars/xlog/src/appender.cc b/mars/xlog/src/appender.cc
+index 3da89cd9..499cdf79 100644
+--- a/mars/xlog/src/appender.cc
++++ b/mars/xlog/src/appender.cc
+@@ -311,14 +311,14 @@ void XloggerAppender::Open(const XLogConfig& _config) {
+         boost::filesystem::create_directories(config_.cachedir_);
+ 
+         thread_timeout_cache_ =
+-            std::make_unique<comm::Thread>(boost::bind(&XloggerAppender::__DelTimeoutFile, this, config_.cachedir_));
+-        thread_timeout_cache_->start_after(2 * 60 * 1000);
++            std::make_unique<comm::Thread>(boost::bind(&XloggerAppender::__DelTimeoutFile, this, config_.logdir_));
++        thread_timeout_cache_->start_after(1 * 60 * 1000);
+         thread_moveold_ = std::make_unique<comm::Thread>(boost::bind(&XloggerAppender::__MoveOldFiles,
+                                                                      this,
+                                                                      config_.cachedir_,
+                                                                      config_.logdir_,
+                                                                      config_.nameprefix_));
+-        thread_moveold_->start_after(3 * 60 * 1000);
++        thread_moveold_->start_after(2 * 60 * 1000);
+ #ifdef __APPLE__
+         setAttrProtectionNone(config_.cachedir_.c_str());
+ #endif
+-- 
+2.47.1.windows.1
+
