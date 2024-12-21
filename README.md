@@ -21,3 +21,8 @@ rm libs-xlog/src/main/jniLibs/*/libmarsstn.so
 # 编译aar
 ./gradlew :libs-xlog:build
 ```
+# License
+该项目使用的 MIT 协议，详细请参考 [LICENSE](https://github.com/junjiantech/vcxss-xlog-patch/blob/master/LICENSE)。
+
+#Thank
+[Mars](https://github.com/Tencent/mars): Mars is a cross-platform network component developed by WeChat.
