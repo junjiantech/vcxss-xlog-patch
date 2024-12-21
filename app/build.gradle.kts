@@ -34,6 +34,7 @@ android {
 
 dependencies {
     implementation(projects.libsXlog)
+    implementation(libs.jakewharton.phoenix)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

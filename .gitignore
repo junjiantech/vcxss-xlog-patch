@@ -15,3 +15,4 @@ libs-xlog/src/main/jniLibs/arm64-v8a/libmarsstn.so
 
 # mars project.
 mars
+build_xlog.bat
