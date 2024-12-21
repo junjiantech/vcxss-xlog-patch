@@ -14,3 +14,5 @@ cp -r libraries/mars_android_sdk/libs/* ../../libs-xlog/src/main/jniLibs/
 @REM 删除仓库
 cd ../../
 rmdir /s/q mars
+@REM 删除 stn so
+rm libs-xlog/src/main/jniLibs/*/libmarsstn.so
