@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -27,16 +29,42 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    libraryVariants.configureEach {
+        outputs.configureEach {
+            val output = this as BaseVariantOutputImpl
+            if (output.outputFileName.endsWith(".aar")) {
+                output.outputFileName = "xlog-patch_${version}.aar"
+            }
+        }
+    }
 }
 
 dependencies {
-    // SoLoader
-    api(libs.facebook.soloader)
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+tasks.register<Jar>("androidSourcesJar") {
+    archiveClassifier.set("sources")
+    from(android.sourceSets.getByName("main").java.srcDirs) // Full Sources
+}
+
+tasks.register<Copy>("copyJar") {
+    from(
+        "build/intermediates/compile_library_classes_jar/release/bundleLibCompileToJarRelease",
+    )
+    into("build/app-classes")
+    include("classes.jar")
+}
+
+// Merge the app classes and the library classes into classes.jar
+tasks.register<Jar>("makeJar") {
+    // Duplicates cause hard to catch errors, better to fail at compile time.
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    dependsOn(tasks.getByName("copyJar"))
+    from(zipTree("build/app-classes/classes.jar"))
+    destinationDirectory.set(layout.buildDirectory)
+    archiveFileName.set("xlog-patch.jar")
 }
