@@ -1,7 +1,6 @@
 package com.vcxss.xlog.patch.sample
 
 import android.app.Application
-import com.facebook.soloader.SoLoader
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.tencent.mars.xlog.Xlog
 import java.io.File
@@ -13,10 +12,8 @@ class VcxssApplication: Application() {
         if (ProcessPhoenix.isPhoenixProcess(this)) {
             return;
         }
-        // 初始化SoLoader
-        SoLoader.init(this, true)
         // Xlog 安全加载
-        Xlog.safeModelLoadLibrary()
+        Xlog.loadLibrary()
 
         // 初始化日志
         initLogAppender()
