@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id("maven-publish")
 }
 
 android {
@@ -41,31 +42,21 @@ android {
     }
 }
 
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = "com.vcxss.android"
+                artifactId = "xlog-patch"
+                version = version
+            }
+        }
+    }
+}
+
 dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
-tasks.register<Jar>("androidSourcesJar") {
-    archiveClassifier.set("sources")
-    from(android.sourceSets.getByName("main").java.srcDirs) // Full Sources
-}
-
-tasks.register<Copy>("copyJar") {
-    from(
-        "build/intermediates/compile_library_classes_jar/release/bundleLibCompileToJarRelease",
-    )
-    into("build/app-classes")
-    include("classes.jar")
-}
-
-// Merge the app classes and the library classes into classes.jar
-tasks.register<Jar>("makeJar") {
-    // Duplicates cause hard to catch errors, better to fail at compile time.
-    duplicatesStrategy = DuplicatesStrategy.FAIL
-    dependsOn(tasks.getByName("copyJar"))
-    from(zipTree("build/app-classes/classes.jar"))
-    destinationDirectory.set(layout.buildDirectory)
-    archiveFileName.set("xlog-patch.jar")
-}
