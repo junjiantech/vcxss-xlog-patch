@@ -46,8 +46,8 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("release") {
-                groupId = "com.vcxss.android"
-                artifactId = "xlog-patch"
+                groupId = "com.github.junjiantech"
+                artifactId = "vcxss-xlog-patch"
                 version = version
             }
         }
